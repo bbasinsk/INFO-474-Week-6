@@ -1,27 +1,29 @@
-body { font: 12px Arial;}
+body {
+  font: 12px Arial;
+}
 
 path {
-    stroke-width: 2;
-    fill: none;
+  stroke-width: 2;
+  fill: none;
 }
 
 .axis path,
 .axis line {
-    fill: none;
-    stroke: grey;
-    stroke-width: 1;
-    shape-rendering: crispEdges;
+  fill: none;
+  stroke: grey;
+  stroke-width: 1;
+  shape-rendering: crispEdges;
 }
 
 div.tooltip {
-    position: absolute;
-    text-align: center;
-    width: 120px;
-    height: 28px;
-    padding: 2px;
-    font: 12px sans-serif;
-    background: lightsteelblue;
-    border: 0px;
-    border-radius: 8px;
-    pointer-events: none;
+  position: absolute;
+  text-align: center;
+  width: 140px;
+  height: 170px;
+  padding: 2px;
+  font: 12px sans-serif;
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  pointer-events: none;
 }

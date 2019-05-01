@@ -26,12 +26,6 @@
       .attr("width", 500)
       .attr("height", 500);
 
-    svgLineContainer = d3
-      .select("body")
-      .append("svg")
-      .attr("width", 500)
-      .attr("height", 500);
-
     // d3.csv is basically fetch but it can be be passed a csv file as a parameter
     d3.csv("./data/dataEveryYear.csv").then(data => makeScatterPlot(data));
   };
@@ -121,6 +115,11 @@
       .attr("class", "tooltip")
       .style("opacity", 0);
 
+    svgLineContainer = div
+      .append("svg")
+      .attr("width", 200)
+      .attr("height", 200);
+
     // append data to SVG and plot as points
     svgPlotContainer
       .selectAll(".dot")
@@ -142,9 +141,14 @@
           .html(
             d.location + "<br/>" + numberWithCommas(d["pop_mlns"] * 1000000)
           )
-          .append(makeLineGraph(d.location))
-          .style("left", d3.event.pageX + "px")
-          .style("top", d3.event.pageY - 28 + "px");
+          .style("left", d3.event.pageX + 20 + "px")
+          .style("top", d3.event.pageY - 58 + "px");
+
+        svgLineContainer = div
+          .append("svg")
+          .attr("width", 200)
+          .attr("height", 200);
+        svgLineContainer.append(makeLineGraph(d.location));
       })
       .on("mouseout", d => {
         div
@@ -156,7 +160,7 @@
 
   function makeLineGraph(country) {
     svgLineContainer.html("");
-    // let countryData = allYearsData.filter(row => row["location"] == country);
+
     let timeData = allYearsData.map(row => row["time"]);
     let lifeExpectancyData = allYearsData.map(row => row["life_expectancy"]);
 
@@ -168,7 +172,8 @@
       "life_expectancy",
       svgLineContainer,
       { min: 40, max: 120 }, //width 80
-      { min: 50, max: 130 } // height 80
+      { min: 20, max: 100 }, // height 80
+      true
     );
 
     return plotLineGraph(funcs, country);
@@ -195,7 +200,7 @@
     svgLineContainer
       .append("text")
       .attr("x", 65)
-      .attr("y", 160)
+      .attr("y", 130)
       .style("font-size", "8pt")
       .text("Year");
 
@@ -208,7 +213,7 @@
 
     svgLineContainer
       .append("text")
-      .attr("transform", "translate(10, 150)rotate(-90)")
+      .attr("transform", "translate(10, 120)rotate(-90)")
       .style("font-size", "8pt")
       .text("Life Expectancy (years)");
 
@@ -217,7 +222,7 @@
 
   // draw the axes and ticks
   // draw the axes and ticks
-  function drawAxes(limits, x, y, svg, rangeX, rangeY) {
+  function drawAxes(limits, x, y, svg, rangeX, rangeY, fewTicks) {
     // return x value from a row of data
     let xValue = function(d) {
       return +d[x];
@@ -235,7 +240,10 @@
     };
 
     // plot x-axis at bottom of SVG
-    let xAxis = d3.axisBottom().scale(xScale);
+    let xAxis = d3
+      .axisBottom()
+      .ticks(fewTicks ? 2 : 10)
+      .scale(xScale);
     svg
       .append("g")
       .attr("transform", "translate(0, " + rangeY.max + ")")
@@ -258,7 +266,10 @@
     };
 
     // plot y-axis at the left of SVG
-    let yAxis = d3.axisLeft().scale(yScale);
+    let yAxis = d3
+      .axisLeft()
+      .ticks(fewTicks ? 4 : 10)
+      .scale(yScale);
     svg
       .append("g")
       .attr("transform", "translate(" + rangeX.min + ", 0)")
