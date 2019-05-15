@@ -155,7 +155,7 @@
           .style("opacity", 0.9);
         div
           .html(
-            `<div><b>Life Expectancy vs. Fertility Rate</b></div><br/><div>${selectedCountry}</div>`
+            `<div><b>Life Expectancy vs. Fertility Rate</b></div><br/><div>Country: ${selectedCountry}</div>`
           )
           .style("left", d3.event.pageX + 20 + "px")
           .style("top", d3.event.pageY - 58 + "px");
