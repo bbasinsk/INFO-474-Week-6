@@ -256,7 +256,8 @@
     let xAxis = d3
       .axisBottom()
       .ticks(fewTicks ? 2 : 10)
-      .scale(xScale);
+      .scale(xScale)
+      .tickFormat(d3.format("d"));
     svg
       .append("g")
       .attr("transform", "translate(0, " + rangeY.max + ")")
@@ -314,10 +315,5 @@
       yMin: yMin,
       yMax: yMax
     };
-  }
-
-  // format numbers
-  function numberWithCommas(x) {
-    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   }
 })();
