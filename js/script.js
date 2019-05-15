@@ -163,7 +163,9 @@
           .duration(200)
           .style("opacity", 0.9);
         div
-          .html("<div>Life Expectancy vs. Fertility Rate</div>")
+          .html(
+            `<div><b>Life Expectancy vs. Fertility Rate</b></div><br/><div>${selectedCountry}</div>`
+          )
           .style("left", d3.event.pageX + 20 + "px")
           .style("top", d3.event.pageY - 58 + "px");
 
@@ -220,8 +222,8 @@
 
     svgSubPlotContainer
       .append("text")
-      .attr("x", 80)
-      .attr("y", 210)
+      .attr("x", 90)
+      .attr("y", 215)
       .style("font-size", "8pt")
       .text("Fertility Rate");
 
