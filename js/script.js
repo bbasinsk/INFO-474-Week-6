@@ -23,13 +23,13 @@
     svgPlotContainer = d3
       .select("body")
       .append("svg")
-      .attr("width", 500)
-      .attr("height", 500);
+      .attr("width", 800)
+      .attr("height", 600);
 
     // d3.csv is basically fetch but it can be be passed a csv file as a parameter
     d3.csv("./data/dataEveryYear.csv")
       .then(data => drawDropdown(data))
-      .then(data => makeScatterPlot(data));
+      .then(data => makeLinePlot(data));
   };
 
   function selectCountry() {
@@ -40,7 +40,7 @@
     selectedCountry = d3.select(this).property("value");
 
     // redraw scatter plot
-    makeScatterPlot(data);
+    makeLinePlot(data);
   }
 
   function drawDropdown(data) {
@@ -66,7 +66,7 @@
   }
 
   // make scatter plot with trend line
-  function makeScatterPlot(csvData) {
+  function makeLinePlot(csvData) {
     data = csvData; // assign data as global variable
     allYearsData = csvData;
 
@@ -83,8 +83,8 @@
       "time",
       "pop_mlns",
       svgPlotContainer,
-      { min: 50, max: 450 },
-      { min: 50, max: 450 }
+      { min: 100, max: 900 },
+      { min: 100, max: 500 }
     );
 
     // plot data as points and add tooltip functionality
@@ -98,21 +98,21 @@
   function makeLabels() {
     svgPlotContainer
       .append("text")
-      .attr("x", 160)
+      .attr("x", 320)
       .attr("y", 40)
       .style("font-size", "14pt")
       .text("Population Over Time");
 
     svgPlotContainer
       .append("text")
-      .attr("x", 240)
-      .attr("y", 490)
+      .attr("x", 440)
+      .attr("y", 550)
       .style("font-size", "10pt")
       .text("Year");
 
     svgPlotContainer
       .append("text")
-      .attr("transform", "translate(15, 300)rotate(-90)")
+      .attr("transform", "translate(45, 350)rotate(-90)")
       .style("font-size", "10pt")
       .text("Population (millions)");
   }
@@ -123,6 +123,7 @@
     // get population data as array
     let pop_data = data.map(row => +row["pop_mlns"]);
     let pop_limits = d3.extent(pop_data);
+
     // make size scaling function for population
     let pop_map_func = d3
       .scaleLinear()
@@ -155,124 +156,84 @@
       .append("path")
       .attr("stroke", "steelblue")
       .attr("d", line)
+      .style("cursor", "pointer")
       .on("mouseover", d => {
         div
           .transition()
           .duration(200)
           .style("opacity", 0.9);
         div
-          .html(
-            d.location + "<br/>" + numberWithCommas(d["pop_mlns"] * 1000000)
-          )
+          .html("<div>Life Expectancy vs. Fertility Rate</div>")
           .style("left", d3.event.pageX + 20 + "px")
           .style("top", d3.event.pageY - 58 + "px");
 
         svgSubPlotContainer = div
           .append("svg")
-          .attr("width", 200)
-          .attr("height", 200);
-        svgSubPlotContainer.append(makeLineGraph(d.location));
+          .attr("width", 250)
+          .attr("height", 250);
+        svgSubPlotContainer.append(makeSubPlotLine());
       })
       .on("mouseout", d => {
         div
           .transition()
-          .duration(500)
+          .duration(200)
           .style("opacity", 0);
       });
-
-    // append data to SVG and plot as points
-    // svgPlotContainer
-    //   .selectAll(".dot")
-    //   .data(data)
-    //   .enter()
-    //   .append("circle")
-    //   .attr("cx", xMap)
-    //   .attr("cy", yMap)
-    //   .attr("r", d => pop_map_func(d["pop_mlns"]))
-    //   .attr("fill", "#4286f4")
-    //   // add tooltip functionality to points
-    //   .on("mouseover", d => {
-    //     div
-    //       .transition()
-    //       .duration(200)
-    //       .style("opacity", 0.9);
-    //     div
-    //       .html(
-    //         d.location + "<br/>" + numberWithCommas(d["pop_mlns"] * 1000000)
-    //       )
-    //       .style("left", d3.event.pageX + 20 + "px")
-    //       .style("top", d3.event.pageY - 58 + "px");
-
-    //     svgSubPlotContainer = div
-    //       .append("svg")
-    //       .attr("width", 200)
-    //       .attr("height", 200);
-    //     svgSubPlotContainer.append(makeLineGraph(d.location));
-    //   })
-    //   .on("mouseout", d => {
-    //     div
-    //       .transition()
-    //       .duration(500)
-    //       .style("opacity", 0);
-    //   });
   }
 
-  function makeLineGraph(country) {
+  function makeSubPlotLine() {
     svgSubPlotContainer.html("");
 
-    let timeData = allYearsData.map(row => row["time"]);
-    let lifeExpectancyData = allYearsData.map(row => row["pop_mlns"]);
+    let fertilityData = allYearsData.map(row => row["fertility_rate"]);
+    let lifeExpectancyData = allYearsData.map(row => row["life_expectancy"]);
 
-    let minMax = findMinMax(timeData, lifeExpectancyData);
+    let minMax = findMinMax(fertilityData, lifeExpectancyData);
 
     let funcs = drawAxes(
       minMax,
-      "time",
-      "pop_mlns",
+      "fertility_rate",
+      "life_expectancy",
       svgSubPlotContainer,
       { min: 40, max: 200 }, //width 160
       { min: 20, max: 180 }, // height 160
       true
     );
 
-    return plotLineGraph(funcs, country);
+    return plotLineGraph(funcs);
   }
 
-  function plotLineGraph(funcs, country) {
-    let countryData = allYearsData.filter(row => row.location == country);
-
-    let line = d3
-      .line()
-      .x(d => funcs.x(d))
-      .y(d => funcs.y(d));
+  function plotLineGraph(funcs) {
+    let countryData = allYearsData.filter(
+      ({ location }) => location === selectedCountry
+    );
 
     svgSubPlotContainer
-      .datum(countryData)
-      .append("path")
-      .attr("fill", "none")
-      .attr("stroke", "steelblue")
-      .attr("stroke-linejoin", "round")
-      .attr("stroke-linecap", "round")
-      .attr("stroke-width", 1.5)
-      .attr("d", line);
+      .selectAll(".dot")
+      .data(countryData)
+      .enter()
+      .append("circle")
+      .attr("cx", funcs.x)
+      .attr("cy", funcs.y)
+      .attr("r", 1)
+      .attr("fill", "#4286f4")
+      .style("opacity", 0.7);
 
     svgSubPlotContainer
       .append("text")
-      .attr("x", 65)
-      .attr("y", 130)
+      .attr("x", 80)
+      .attr("y", 210)
       .style("font-size", "8pt")
-      .text("Year");
+      .text("Fertility Rate");
 
     svgSubPlotContainer
       .append("text")
-      .attr("transform", "translate(10, 120)rotate(-90)")
+      .attr("transform", "translate(10, 130)rotate(-90)")
       .style("font-size", "8pt")
-      .text("Life Expectancy (years)");
+      .text("Life Expectancy");
 
     return svgSubPlotContainer;
   }
 
-  // draw the axes and ticks
   // draw the axes and ticks
   function drawAxes(limits, x, y, svg, rangeX, rangeY, fewTicks) {
     // return x value from a row of data
