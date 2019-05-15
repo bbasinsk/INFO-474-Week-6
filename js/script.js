@@ -120,16 +120,6 @@
   // plot all the data points on the SVG
   // and add tooltip functionality
   function plotData(map) {
-    // get population data as array
-    let pop_data = data.map(row => +row["pop_mlns"]);
-    let pop_limits = d3.extent(pop_data);
-
-    // make size scaling function for population
-    let pop_map_func = d3
-      .scaleLinear()
-      .domain([pop_limits[0], pop_limits[1]])
-      .range([3, 20]);
-
     // mapping functions
     let xMap = map.x;
     let yMap = map.y;
@@ -155,6 +145,7 @@
       .data([data.filter(({ location }) => location === selectedCountry)])
       .append("path")
       .attr("stroke", "steelblue")
+      .style("stroke-width", 3)
       .attr("d", line)
       .style("cursor", "pointer")
       .on("mouseover", d => {
@@ -216,9 +207,9 @@
       .append("circle")
       .attr("cx", funcs.x)
       .attr("cy", funcs.y)
-      .attr("r", 1)
-      .attr("fill", "#4286f4")
-      .style("opacity", 0.7);
+      .attr("r", 1.5)
+      .attr("fill", "steelblue")
+      .style("opacity", 1);
 
     svgSubPlotContainer
       .append("text")
